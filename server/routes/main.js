@@ -1,12 +1,10 @@
 const express = require('express');
-const router = express.Router();
 const path = require('path');
-let parentDIR = path.dirname(__filename);
-parentDIR = path.dirname(parentDIR);
-parentDIR = path.dirname(parentDIR);
+const router = express.Router();
+const parentDirectory = path.resolve(__dirname, '../../public/html');
 
-// Route
 router.get('/', (req, res) => {
-    res.redirect('html/index.html');
-}
-);
+  res.sendFile(path.join(parentDirectory, 'index.html'));
+});
+
+module.exports = router;
