@@ -7,4 +7,8 @@ router.get('/', (req, res) => {
   res.sendFile(path.join(parentDirectory, 'index.html'));
 });
 
+router.get('/', (req, res) => {
+  res.sendFile(path.join(parentDirectory, 'index.html'));
+});
+
 module.exports = router;

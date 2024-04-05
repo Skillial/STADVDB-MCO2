@@ -12,6 +12,14 @@ const mainRouter = require('./server/routes/main')
 app.use('/', mainRouter);
 
 const PORT = process.env.PORT;
+const DB_PORT_1 = process.env.DB_PORT_1;
+const DB_PORT_2 = process.env.DB_PORT_2;
+const DB_PORT_3 = process.env.DB_PORT_3;
+const DB_USER = process.env.DB_USER;
+const DB_HOST = process.env.DB_HOST;
+const DB_DATABASE = process.env.DB_DATABASE;
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
     console.log(`Server running on http://localhost:${PORT}`);
@@ -19,14 +27,14 @@ app.listen(PORT, () => {
 
 function createConnection(port) {
     return mysql.createConnection({
-      host: 'ccscloud.dlsu.edu.ph',
-      user: 'root',
-      database: 'distributed_database',
+      host: DB_HOST,
+      user: DB_USER,
+      database: DB_DATABASE,
       port: port
     });
   }
   
   // Create connections
-  const server0 = createConnection(20141);
-  const server1 = createConnection(20142);
-  const server2 = createConnection(20143);
+  const server0 = createConnection(DB_PORT_1);
+  const server1 = createConnection(DB_PORT_2);
+  const server2 = createConnection(DB_PORT_3);
