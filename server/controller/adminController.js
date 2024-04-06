@@ -20,6 +20,10 @@ function createConnection(port) {
 const admin = {
 
     render: (req, res) => {
+        const cookies = req.cookies;
+        if (!(cookies.mode === '1' || cookies.mode === '2')) {
+            return res.redirect('/dashboard');
+        }
         try {
             res.render('admin');
         } catch (error) {
@@ -49,7 +53,21 @@ const admin = {
         }
         try {
             res.json(results);
-        } catch (error) { 
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
+    mode: async (req, res) => {
+        const cookies = req.cookies;
+        if (cookies.mode === '1') {
+            await res.cookie('mode', '2');
+        } else {
+            await res.cookie('mode', '1');
+        }
+        try {
+            res.json({ response: 'ok' })
+        } catch (error) {
             console.error(error);
         }
     }
