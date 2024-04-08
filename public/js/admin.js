@@ -32,21 +32,26 @@
 
 
 const nodeID = ['Central', 'Luzon', 'VisMin'];
-let divs = [];
+const checkBox = ['CentralCheck', 'LuzonCheck', 'VisMinCheck']
+let nodeDivs = [];
+let checkDivs = [];
 const worker = new Worker('/js/worker.js');
 const time = document.getElementById('Time');
 
 for (let i = 0; i < 3; i++) {
-    divs.push(document.getElementById(nodeID[i]));
+    nodeDivs.push(document.getElementById(nodeID[i]));
+    checkDivs.push(document.getElementById(checkBox[i]));
 }
 
 worker.addEventListener('message', function(e) {
     const data = e.data;
     for (let i = 0; i < 3; i++) {
         if (data[i] === 0) {
-            divs[i].textContent = 'green';
+            nodeDivs[i].style.backgroundColor = 'green';
+            checkDivs[i].checked = true;
         } else {
-            divs[i].textContent = 'red';
+            nodeDivs[i].style.backgroundColor = 'red';
+            checkDivs[i].checked = false;
         }
     }
     time.textContent = "Last Update: " + new Date().toLocaleTimeString();

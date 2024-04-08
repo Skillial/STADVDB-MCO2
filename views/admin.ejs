@@ -21,14 +21,61 @@
     <div class="row flex-nowrap">
       <%-include('components/sidebar.ejs')%>
       <div class="col py-3">
-        <div class="container">
+        <div class="container mt-5">
           <h1>Admin</h1>
+          <div class="card text-center mt-4">
+            <div class="card-header">
+              Servers
+            </div>
+            <div class="card-body">
+
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Central Server</h5>
+                      <p>Status:</p>
+                      <div class="status-circle mb-4" id="Central"></div>
+                      <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="CentralCheck">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Luzon Server</h5>
+                      <p>Status:</p>
+                      <div class="status-circle mb-4" id="Luzon"></div>
+                      <div ></div>
+                      <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="LuzonCheck">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">VisMin Server</h5>
+                      <p>Status:</p>
+                      <div class="status-circle mb-4" id="VisMin"></div>
+                      <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="VisMinCheck">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button id ="Mode" class="btn btn-primary mt-4">Change</button>
+            </div>
+            <div id="Time" class="card-footer text-muted">
+              Last update: Not Yet Updated
+            </div>
+          </div>
         </div>
-        <div id="Central"></div>
-        <div id="Luzon"></div>
-        <div id="VisMin"></div>
-        <div id="Time">Last update: Not Yet Updated</div>
-        <button id ='Mode'>Change</button>
       </div>
     </div>
 	</div>
