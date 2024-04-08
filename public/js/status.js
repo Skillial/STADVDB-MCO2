@@ -11,7 +11,6 @@
 //     fetch('/status')
 //         .then(response => response.json())
 //         .then(data => {
-//             console.log("here");
 //             for (let i = 0; i < 3; i++) {
 //                 if (data[i] == 0) {
 //                     divs[i].textContent = 'green';
@@ -32,7 +31,6 @@
 
 
 const nodeID = ['Central', 'Luzon', 'VisMin'];
-const checkBox = ['CentralCheck', 'LuzonCheck', 'VisMinCheck']
 let nodeDivs = [];
 let checkDivs = [];
 const worker = new Worker('/js/worker.js');
@@ -40,18 +38,17 @@ const time = document.getElementById('Time');
 
 for (let i = 0; i < 3; i++) {
     nodeDivs.push(document.getElementById(nodeID[i]));
-    checkDivs.push(document.getElementById(checkBox[i]));
 }
 
 worker.addEventListener('message', function(e) {
     const data = e.data;
     for (let i = 0; i < 3; i++) {
-        if (data[i] === 0) {
+        if (data[i] == 0) {
             nodeDivs[i].style.backgroundColor = 'green';
-            checkDivs[i].checked = true;
-        } else {
+        } else if (data[i] == 1){
             nodeDivs[i].style.backgroundColor = 'red';
-            checkDivs[i].checked = false;
+        } else {
+            nodeDivs[i].style.backgroundColor = 'yellow';
         }
     }
     time.textContent = "Last Update: " + new Date().toLocaleTimeString();

@@ -5,7 +5,7 @@ self.addEventListener('message', function(e) {
 }, false);
 
 function updateStatus() {
-    fetch('/status')
+    fetch('/admin/status')
         .then(response => response.json())
         .then(data => {
             self.postMessage(data); 

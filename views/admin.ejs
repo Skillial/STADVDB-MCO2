@@ -12,8 +12,9 @@
 
   <!-- JS Files -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js" defer></script>
-  <script src="/js/admin.js" defer></script>
+  <script src="/js/status.js" defer></script>
   <script src="/js/mode.js" defer></script>
+  <script src="/js/hide.js" defer></script>
 
 </head>
 <body>
@@ -28,16 +29,40 @@
               Servers
             </div>
             <div class="card-body">
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="mb-4"><strong>Legend:</strong></h5>
+                  <div class="row mb-4 justify-content-around">
+                    <div class="col-sm-3 align-items-center justify-content-center d-flex ">
+                      <div class="status-circle" style="background-color: green;"></div>
+                      <span class="ms-1"> Connected</span>
+                    </div>
+                    <div class="col-sm-3 align-items-center justify-content-center d-flex">
+                      <div class="status-circle" style="background-color: yellow;"></div>
+                      <span class="ms-1"> Hidden</span>
+                    </div>
+                    <div class="col-sm-3 align-items-center justify-content-center d-flex">
+                      <div class="status-circle" style="background-color: red;"></div>
+                      <span class="ms-1"> Disconnected</span>
+                    </div>
+                    <div class="col-sm-3 align-items-center justify-content-center d-flex ">
+                      <div class="status-circle" style="background-color: white;"></div>
+                      <span class="ms-1"> Loading</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div class="row">
                 <div class="col-sm-4">
                   <div class="card">
                     <div class="card-body">
-                      <h5 class="card-title">Central Server</h5>
+                      <h5 class="card-title"><strong>Central Server</strong></h5>
                       <p>Status:</p>
                       <div class="status-circle mb-4" id="Central"></div>
+                      <p>Hide Server:</p>
                       <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" role="switch" id="CentralCheck">
+                        <input class="form-check-input" type="checkbox" role="switch" id="CentralCheck" <% if (centralHide==2) {%> checked<%} %>>
                       </div>
                     </div>
                   </div>
@@ -45,12 +70,12 @@
                 <div class="col-sm-4">
                   <div class="card">
                     <div class="card-body">
-                      <h5 class="card-title">Luzon Server</h5>
+                      <h5 class="card-title"><strong>Luzon Server</strong></h5>
                       <p>Status:</p>
                       <div class="status-circle mb-4" id="Luzon"></div>
-                      <div ></div>
+                      <p>Hide Server:</p>
                       <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" role="switch" id="LuzonCheck">
+                        <input class="form-check-input" type="checkbox" role="switch" id="LuzonCheck" <% if (luzonHide==2) {%> checked<%} %>>
                       </div>
                     </div>
                   </div>
@@ -58,18 +83,19 @@
                 <div class="col-sm-4">
                   <div class="card">
                     <div class="card-body">
-                      <h5 class="card-title">VisMin Server</h5>
+                      <h5 class="card-title"><strong>VisMin Server</strong></h5>
                       <p>Status:</p>
                       <div class="status-circle mb-4" id="VisMin"></div>
+                      <p>Hide Server:</p>
                       <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" role="switch" id="VisMinCheck">
+                        <input class="form-check-input" type="checkbox" role="switch" id="VisMinCheck" <% if (visminHide==2) {%> checked<%} %>>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <button id ="Mode" class="btn btn-primary mt-4">Change</button>
+              <button id ="Mode" class="btn btn-primary mt-4">Change Mode</button>
             </div>
             <div id="Time" class="card-footer text-muted">
               Last update: Not Yet Updated

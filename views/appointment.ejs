@@ -17,6 +17,7 @@
   <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js" defer></script>
   <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js" defer></script>
   <script src="/js/appointment.js" defer></script>
+  <script src="/js/datatable.js" defer></script>
 
 </head>
 <body>
@@ -26,47 +27,119 @@
       <div class="col py-3">
         <div class="container mt-5">
           <h1>Appointments</h1>
-          <div class="mt-4">
-            <table id="example" class="table table-striped nowrap" style="width:90%">
-              <thead>
-                <tr>
-                  <th>Appointment ID</th>
-                  <th>Status</th>
-                  <th>Time Queued</th>
-                  <th>Date Queued</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Type</th>
-                  <th>Virtual</th>
-                  <th>Hospital Name</th>
-                  <th>City</th>
-                  <th>Province</th>
-                  <th>Region Name</th>
-                  <th>Specialty</th>
-                  <th>Patient Age</th>
-                  <th>Patient Gender</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
+
+          <!-- Search by AppID -->
+          <div class="container mt-3">
+            <form id="searchAppID">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" id="appointmentId" placeholder="Search Appointments" aria-label="Search Appointments">
+                <div class="input-group-append">
+                    <button class="input-group-text"><i class="bi bi-search"></i></button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Search by Filter -->
+          <div class="container mt-3">
+            <div class="card">
+              <div class="card-header">Filters</div>
+              <div class="card-body">
+                <form id="searchFilter">
+                  <div class="row">
+                    <div class="col mb-3">
+                      <label for="Status" class="form-label">Status</label>
+                      <select class="form-select" id="Status" aria-label="Appointment Status">
+                        <option selected disabled value="">Appointment Status</option>
+                        <option value="">None</option>
+                        <option value="Queued">Queued</option>
+                        <option value="Serving">Serving</option>
+                        <option value="NoShow">NoShow</option>
+                        <option value="Complete">Complete</option>
+                        <option value="Cancel">Cancel</option>
+                        <option value="Skip">Skip</option>
+                      </select>
+                    </div>
+                    <div class="col mb-3">
+                      <label for="Type" class="form-label">Type</label>
+                      <select class="form-select" id="Type" aria-label="Appointment Type">
+                        <option selected disabled value="">Appointment Type</option>
+                        <option value="">None</option>
+                        <option value="Consultation">Consultation</option>
+                        <option value="Inpatient">Inpatient</option>
+                      </select>
+                    </div>
+                    <div class="col mb-3">
+                      <label for="Virtual" class="form-label">Virtual</label>
+                      <select class="form-select" id="Virtual" aria-label="Virtual Appointment">
+                        <option selected disabled value="">Is Virtual Appointment?</option>
+                        <option value="">None</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                      </select>
+                    </div>
+                    <div class="col mb-3">
+                      <label for="Hospital" class="form-label">Hospital</label>
+                      <select class="form-select" id="Hospital" aria-label="Is Hospital">
+                        <option selected disabled value="">Is Hospital?</option>
+                        <option value="">None</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col mb-3">
+                      <label for="City" class="form-label">City</label>
+                      <input type="text" class="form-control" id="City">
+                    </div>
+                    <div class="col mb-3">
+                      <label for="Province" class="form-label">Province</label>
+                      <input type="text" class="form-control" id="Province">
+                    </div>
+                    <div class="col mb-3">
+                      <label for="Region" class="form-label">Region Name</label>
+                      <select class="form-select" id="Region" aria-label="Region Name">
+                        <option selected disabled value="">Region Name</option>
+                        <option value="">None</option>
+                        <option disabled>Luzon</option>
+                        <option value="Ilocos Region (I)">Ilocos Region (I)</option>
+                        <option value="Cagayan Valley (II)">Cagayan Valley (II)</option>
+                        <option value="Central Luzon (III)">Central Luzon (III)</option>
+                        <option value="CALABARZON (IV-A)">CALABARZON (IV-A)</option>
+                        <option value="MIMAROPA Region (IV-B)">MIMAROPA Region (IV-B)</option>
+                        <option value="Bicol Region (V)">Bicol Region (V)</option>
+                        <option value="National Capital Region (NCR)">National Capital Region (NCR)</option>
+                        <option value="Cordillera Administrative Region (CAR)">Cordillera Administrative Region (CAR)</option>
+                        <option disabled>Visayas</option>
+                        <option value="Western Visayas (VI)">Western Visayas (VI)</option>
+                        <option value="Central Visayas (VII)">Central Visayas (VII)</option>
+                        <option value="Eastern Visayas (VIII)">Eastern Visayas (VIII)</option>
+                        <option disabled>Mindanao</option>
+                        <option value="Zamboanga Peninsula (IX)">Zamboanga Peninsula (IX)</option>
+                        <option value="Northern Mindanao (X)">Northern Mindanao (X)</option>
+                        <option value="Davao Region (XI)">Davao Region (XI)</option>
+                        <option value="SOCCSKSARGEN (Cotabato Region) (XII)">SOCCSKSARGEN (Cotabato Region) (XII)</option>
+                        <option value="Caraga (XIII)">Caraga (XIII)</option>
+                        <option value="Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)">Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col mb-3">
+                    <label for="Specialty" class="form-label">Doctor Specialty</label>
+                    <input type="text" class="form-control" id="Specialty">
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary m-auto">Filter</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <%-include('components/datatable.ejs')%>
+          <div class="d-flex justify-content-center">
+            <a href="/newRecord" id ="Mode" class="btn btn-primary mt-4">Add New Appointment</a>
           </div>
         </div>
       </div>

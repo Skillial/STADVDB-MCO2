@@ -1,31 +1,14 @@
-require('dotenv').config();
-const mysql = require('mysql');
-
-const DB_PORT_1 = process.env.DB_PORT_1;
-const DB_PORT_2 = process.env.DB_PORT_2;
-const DB_PORT_3 = process.env.DB_PORT_3;
-const DB_USER = process.env.DB_USER;
-const DB_HOST = process.env.DB_HOST;
-const DB_DATABASE = process.env.DB_DATABASE;
-const DB_PORTS = [DB_PORT_1, DB_PORT_2, DB_PORT_3];
-
-function createConnection(port) {
-    return mysql.createConnection({
-        host: DB_HOST,
-        user: DB_USER,
-        database: DB_DATABASE,
-        port: port
-    });
-}
+const { createConnection, DB_PORTS } = require('./../db/config');
+const { cookieChecker } = require('./../checker/cookie');
 const admin = {
 
     render: (req, res) => {
-        const cookies = req.cookies;
-        if (!(cookies.mode === '1' || cookies.mode === '2')) {
-            return res.redirect('/dashboard');
-        }
+        cookieChecker(req, res);
+        luzonHide = req.cookies.Luz;
+        visminHide = req.cookies.VisMin;
+        centralHide = req.cookies.Central;
         try {
-            res.render('admin');
+            res.render('admin', { luzonHide, visminHide, centralHide });
         } catch (error) {
             console.error(error);
         }
@@ -33,6 +16,7 @@ const admin = {
 
     status: async (req, res) => {
         let results = [];
+        let cookieList = [req.cookies.Central, req.cookies.Luz, req.cookies.VisMin];
         for (let i = 0; i < DB_PORTS.length; i++) {
             let connection = createConnection(DB_PORTS[i]);
             try {
@@ -41,8 +25,13 @@ const admin = {
                         if (err) {
                             results.push(1);
                         } else {
-                            results.push(0);
+                            if (cookieList[i] == 2) {
+                                results.push(2);
+                            } else {
+                                results.push(0);
+                            }
                         }
+                        console.log("here")
                         resolve();
                     });
                 });
@@ -67,6 +56,41 @@ const admin = {
         }
         try {
             res.json({ response: 'ok' })
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
+    hide: async (req, res) => {
+        const i = req.params.type;
+        let val;
+        if (i == 0) {
+            if (req.cookies.Central == 1) {
+                await res.cookie('Central', 2);
+                val = 2;
+            } else {
+                await res.cookie('Central', 1);
+                val = 1;
+            }
+        } else if (i == 1) {
+            if (req.cookies.VisMin == 1) {
+                await res.cookie('VisMin', 2);
+                val = 2;
+            } else {
+                await res.cookie('VisMin', 1);
+                val = 1;
+            }
+        } else if (i == 2) {
+            if (req.cookies.Luz == 1) {
+                await res.cookie('Luz', 2);
+                val = 2;
+            } else {
+                await res.cookie('Luz', 1);
+                val = 1;
+            }
+        }
+        try {
+            res.json({ val })
         } catch (error) {
             console.error(error);
         }
