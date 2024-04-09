@@ -158,44 +158,87 @@ const dashboard = {
         const RegionName = req.params.region;
 
         let sql = `SELECT MainSpecialty, COUNT(*) AS count FROM appointments WHERE RegionName = '${RegionName}' GROUP BY MainSpecialty`;
-
-        const centralConnection = createConnection(DB_PORTS[0]);
-        let luzonError = 0;
-
-        try {
-            await new Promise((resolve, reject) => {
-                centralConnection.connect(err => {
-                    if (err || req.cookies.Central == 2) {
-                        luzonError = 1;
-                        resolve();
-                    } else {
-                        centralConnection.query(sql, (err, result) => {
-                            if (err) {
-                                console.error('Error executing query:', err);
-                                reject('Error fetching data from MySQL');
-                                return;
-                            }
-                            
-                            const data = {
-                                labels: [],
-                                values: []
-                            };
-                            
-                            result.forEach(entry => {
-                                data.labels.push(entry.MainSpecialty);
-                                data.values.push(entry.count);
-                            });
-
-                            res.json(data);
+        const none = [];
+        let centralError = 0, fragError = 0;
+        let  data = {
+            labels: [],
+            values: []
+        };;
+        async function centralFetch() {
+            const centralConnection = createConnection(DB_PORTS[0]);
+            try {
+                await new Promise((resolve, reject) => {
+                    centralConnection.connect(err => {
+                        if (err || req.cookies.Central == 2) {
+                            centralError = 1;
                             resolve();
-                        });
-                    }
+                        } else {
+                            centralConnection.query(sql, (err, result) => {
+                                if (err || req.cookies.Central == 2) {
+                                    centralError = 1;
+                                    resolve();
+                                }
+
+                                result.forEach(entry => {
+                                    data.labels.push(entry.MainSpecialty);
+                                    data.values.push(entry.count);
+                                });
+                                resolve();
+                            });
+                        }
+                    });
                 });
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'An unexpected error occurred' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'An unexpected error occurred' });
+            }
         }
+
+        async function fragFetch() {
+            let connection, hidden;
+            if (LUZON.includes(RegionName)) {
+                connection = createConnection(DB_PORTS[1]);
+                hidden = req.cookies.Luz;
+            } else {
+                connection = createConnection(DB_PORTS[2]);
+                hidden = req.cookies.VisMin;
+            }
+            try {
+                await new Promise((resolve, reject) => {
+                    connection.connect(err => {
+                        if (err || hidden == 2) {
+                            fragError = 1;
+                            resolve();
+                        } else {
+                            connection.query(sql, (err, result) => {
+                                if (err || hidden == 2) {
+                                    fragError = 1;
+                                    resolve();
+                                }
+
+                                result.forEach(entry => {
+                                    data.labels.push(entry.MainSpecialty);
+                                    data.values.push(entry.count);
+                                });
+                                resolve();
+                            });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'An unexpected error occurred' });
+            }
+        }
+        await centralFetch();
+        if (centralError == 1){
+            await fragFetch();
+            if (fragError == 1){
+                return res.json(none);
+            }
+        }
+        res.json(data);
+
     }
 }
 
