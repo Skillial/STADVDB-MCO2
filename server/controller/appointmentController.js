@@ -89,8 +89,13 @@ const appointment = {
                 console.error(error);
             }
         }
-        await insertCentral();
-        await insertFrag();
+        if (req.cookies.mode == 1) {
+            await insertCentral();
+            await insertFrag();
+        } else {
+            await insertFrag();
+            await insertCentral();
+        }
         if (centralError == 1 && fragError == 1) {
             return res.status(500).json({ message: "Error inserting data." });
         } else if (centralError == 1) {
@@ -384,8 +389,14 @@ const appointment = {
                 console.error(error);
             }
         }
-        await deleteCentral();
-        await deleteFrag();
+        if (req.cookies.mode == 1) {
+            await deleteCentral();
+            await deleteFrag();
+        } else {
+            await deleteFrag();
+            await deleteCentral();
+        }
+
         if (centralError == 1 && fragError == 1) {
             return res.status(500).json({ message: "Error deleting row." });
         } else if (centralError == 1) {
@@ -470,12 +481,21 @@ const appointment = {
                 console.error(error);
             }
         }
-
-        await centralRecord();
-        if (centralError == 1) {
+        if (req.cookies.mode == 1) {
+            await centralRecord();
+            if (centralError == 1) {
+                await fragRecord();
+                if (fragError == 1) {
+                    return res.status(500).json({ message: "Error searching for appointment." });
+                }
+            }
+        } else {
             await fragRecord();
             if (fragError == 1) {
-                return res.status(500).json({ message: "Error searching for appointment." });
+                await centralRecord();
+                if (centralError == 1) {
+                    return res.status(500).json({ message: "Error searching for appointment." });
+                }
             }
         }
         res.render('editRecord', { data: totalResults[0] });
@@ -548,8 +568,14 @@ const appointment = {
                 console.error(error);
             }
         }
-        await updateCentral();
-        await updateFrag();
+        if (req.cookies.mode == 1) {
+            await updateCentral();
+            await updateFrag();
+        } else {
+            await updateFrag();
+            await updateCentral();
+        }
+
         if (centralError == 1 && fragError == 1) {
             return res.status(500).json({ error: 'Failed to update row' });
         } else if (centralError == 1) {
