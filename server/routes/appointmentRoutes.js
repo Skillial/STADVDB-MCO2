@@ -7,8 +7,8 @@ router.get('/newRecord', controller.newRecord);
 router.post('/insertRecord', controller.insertRecord);
 router.post('/searchAppID', controller.searchAppID);
 router.post('/searchFilter', controller.searchFilter);
-router.delete('/deleteRow/:id', controller.deleteRow);
-router.get('/editRecord/:id', controller.editRecord);
+router.delete('/deleteRow/:id/:RegionName', controller.deleteRow);
+router.get('/editRecord/:id/:RegionName', controller.editRecord);
 router.put('/updateRecord', controller.updateRecord);
 
 module.exports = router;

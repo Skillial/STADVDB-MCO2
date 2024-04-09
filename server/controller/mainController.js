@@ -152,9 +152,51 @@ const dashboard = {
         } catch (error) {
             console.error(error);
         }
+    },
+
+    fetchData: async (req, res) => {
+        const RegionName = req.params.region;
+
+        let sql = `SELECT MainSpecialty, COUNT(*) AS count FROM appointments WHERE RegionName = '${RegionName}' GROUP BY MainSpecialty`;
+
+        const centralConnection = createConnection(DB_PORTS[0]);
+        let luzonError = 0;
+
+        try {
+            await new Promise((resolve, reject) => {
+                centralConnection.connect(err => {
+                    if (err || req.cookies.Central == 2) {
+                        luzonError = 1;
+                        resolve();
+                    } else {
+                        centralConnection.query(sql, (err, result) => {
+                            if (err) {
+                                console.error('Error executing query:', err);
+                                reject('Error fetching data from MySQL');
+                                return;
+                            }
+                            
+                            const data = {
+                                labels: [],
+                                values: []
+                            };
+                            
+                            result.forEach(entry => {
+                                data.labels.push(entry.MainSpecialty);
+                                data.values.push(entry.count);
+                            });
+
+                            res.json(data);
+                            resolve();
+                        });
+                    }
+                });
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An unexpected error occurred' });
+        }
     }
-
-
 }
 
 module.exports = dashboard;

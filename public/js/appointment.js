@@ -13,7 +13,8 @@ function displaySearchResults(data) {
     data.forEach(rowData => {
         const values = Object.values(rowData);
         const apptid = rowData.apptid;
-        values.push(`<a href="#" class="bi bi-pencil-square" onclick="editRow(this, '${apptid}')"></a>`, `<a href="#" class="bi bi-trash-fill" onclick="deleteRow(this, '${apptid}')"></a>`);
+        const RegionName = rowData.RegionName;
+        values.push(`<a href="#" class="bi bi-pencil-square" onclick="editRow(this, '${apptid}', '${RegionName}')"></a>`, `<a href="#" class="bi bi-trash-fill" onclick="deleteRow(this, '${apptid}', '${RegionName}')"></a>`);
         table.row.add(values).draw();
     });
 }
@@ -81,11 +82,11 @@ document.getElementById("searchFilter").addEventListener("submit", async functio
     });
 });
 
-async function deleteRow(link, apptid) {
+async function deleteRow(link, apptid, RegionName) {
     const id = apptid;
     
     if (confirm('Are you sure you want to delete this row?')) {
-        await fetch(`/deleteRow/${id}`, {
+        await fetch(`/deleteRow/${id}/${RegionName}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -117,11 +118,10 @@ async function deleteRow(link, apptid) {
     }
 }
 
-async function editRow(link, apptid) {
+async function editRow(link, apptid, RegionName) {
     const id = apptid;
-
     if (confirm('Are you sure you want to edit this row?')) {
-        window.location.href = `/editRecord/${id}`;
+        window.location.href = `/editRecord/${id}/${RegionName}`;
     }
     
 }

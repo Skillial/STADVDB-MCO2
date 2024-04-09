@@ -85,29 +85,7 @@
               </div>
               <div class="mb-3">
                 <label for="Region" class="form-label"><strong>Region Name</strong></label>
-                <select class="form-select" id="Region" aria-label="Region Name">
-                  <option value="<%= data.RegionName %>" selected disabled hidden><%= data.RegionName %></option>
-                  <option disabled>Luzon</option>
-                  <option value="Ilocos Region (I)">Ilocos Region (I)</option>
-                  <option value="Cagayan Valley (II)">Cagayan Valley (II)</option>
-                  <option value="Central Luzon (III)">Central Luzon (III)</option>
-                  <option value="CALABARZON (IV-A)">CALABARZON (IV-A)</option>
-                  <option value="MIMAROPA Region (IV-B)">MIMAROPA Region (IV-B)</option>
-                  <option value="Bicol Region (V)">Bicol Region (V)</option>
-                  <option value="National Capital Region (NCR)">National Capital Region (NCR)</option>
-                  <option value="Cordillera Administrative Region (CAR)">Cordillera Administrative Region (CAR)</option>
-                  <option disabled>Visayas</option>
-                  <option value="Western Visayas (VI)">Western Visayas (VI)</option>
-                  <option value="Central Visayas (VII)">Central Visayas (VII)</option>
-                  <option value="Eastern Visayas (VIII)">Eastern Visayas (VIII)</option>
-                  <option disabled>Mindanao</option>
-                  <option value="Zamboanga Peninsula (IX)">Zamboanga Peninsula (IX)</option>
-                  <option value="Northern Mindanao (X)">Northern Mindanao (X)</option>
-                  <option value="Davao Region (XI)">Davao Region (XI)</option>
-                  <option value="SOCCSKSARGEN (Cotabato Region) (XII)">SOCCSKSARGEN (Cotabato Region) (XII)</option>
-                  <option value="Caraga (XIII)">Caraga (XIII)</option>
-                  <option value="Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)">Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)</option>
-                </select>
+                <input type="text" class="form-control" id="Region" value="<%= data.RegionName %>" disabled>
               </div>
               <div class="col-lg-8 mb-3">
                 <label for="Specialty" class="form-label"><strong>Doctor Specialty</strong></label>

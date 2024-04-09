@@ -10,6 +10,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/dashboard', controller.render);
+router.get('/fetchData/:region', controller.fetchData);
 
 router.use('/', appointment);
 router.use('/', admin);

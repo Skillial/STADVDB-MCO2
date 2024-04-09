@@ -12,6 +12,9 @@
 
   <!-- JS Files -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>
+
 
 </head>
 <body>
@@ -50,7 +53,33 @@
               </div>
             </div>
             <div class="container col-8 align-middle">
-              <canvas id="myChart" style="display: block; box-sizing: border-box; height: 535px; width: 856px;" width="959" height="479"></canvas>
+              <div class="row-1 mb-3">
+                <label for="Region" class="form-label"><strong>Region Name</strong></label>
+                <select class="form-select" id="Region" aria-label="Region Name" required>
+                  <option value="" hidden>Region Name</option>
+                  <option disabled>Luzon</option>
+                  <option value="Ilocos Region (I)">Ilocos Region (I)</option>
+                  <option value="Cagayan Valley (II)">Cagayan Valley (II)</option>
+                  <option value="Central Luzon (III)">Central Luzon (III)</option>
+                  <option value="CALABARZON (IV-A)">CALABARZON (IV-A)</option>
+                  <option value="MIMAROPA Region (IV-B)">MIMAROPA Region (IV-B)</option>
+                  <option value="Bicol Region (V)">Bicol Region (V)</option>
+                  <option value="National Capital Region (NCR)">National Capital Region (NCR)</option>
+                  <option value="Cordillera Administrative Region (CAR)">Cordillera Administrative Region (CAR)</option>
+                  <option disabled>Visayas</option>
+                  <option value="Western Visayas (VI)">Western Visayas (VI)</option>
+                  <option value="Central Visayas (VII)">Central Visayas (VII)</option>
+                  <option value="Eastern Visayas (VIII)">Eastern Visayas (VIII)</option>
+                  <option disabled>Mindanao</option>
+                  <option value="Zamboanga Peninsula (IX)">Zamboanga Peninsula (IX)</option>
+                  <option value="Northern Mindanao (X)">Northern Mindanao (X)</option>
+                  <option value="Davao Region (XI)">Davao Region (XI)</option>
+                  <option value="SOCCSKSARGEN (Cotabato Region) (XII)">SOCCSKSARGEN (Cotabato Region) (XII)</option>
+                  <option value="Caraga (XIII)">Caraga (XIII)</option>
+                  <option value="Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)">Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)</option>
+                </select>
+              </div>
+              <canvas class="row" id="myChart" style="display: block; box-sizing: border-box; height: 535px; width: 856px;" width="959" height="479"></canvas>
             </div>
           </div>
         </div>
