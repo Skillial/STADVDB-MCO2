@@ -32,14 +32,18 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                         centralConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
                             if (err) {
                                 console.error("Error inserting data:", err);
                                 centralError = 1;
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log("Data inserted successfully.");
                         });
@@ -69,13 +73,18 @@ const appointment = {
                     fragConnection.connect(err => {
                         if (err || hidden == 2) {
                             fragError = 1;
-                            resolve();
+                            fragConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                         fragConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
                             if (err) {
                                 console.error("Error inserting data:", err);
                                 fragError = 1;
+                                fragConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log("Data inserted successfully.");
 
@@ -119,21 +128,27 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
                         centralConnection.query(query, [appointmentId], (err, results) => {
                             if (err) {
                                 console.error("Error searching for appointment:", err);
                                 centralError = 1;
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
                                     totalResults.push(results[key]);
                                 }
                             }
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         });
                     });
                 });
@@ -158,7 +173,9 @@ const appointment = {
                         connection.connect(err => {
                             if (err || cookie == 2) {
                                 fragError = 1;
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             }
 
                             let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
@@ -166,14 +183,18 @@ const appointment = {
                                 if (err) {
                                     console.error("Error searching for appointment:", err);
                                     fragError = 1;
-                                    resolve();
+                                    connection.end(() => {
+                                        resolve();
+                                    });
                                 }
                                 for (let key in results) {
                                     if (results.hasOwnProperty(key)) {
                                         totalResults.push(results[key]);
                                     }
                                 }
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             });
                         });
                     });
@@ -235,20 +256,26 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         centralConnection.query(query, values, (err, results) => {
                             if (err) {
                                 console.error("Error searching:", err);
                                 centralError = 1;
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
                                     totalResults.push(results[key]);
                                 }
                             }
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         });
                     });
                 });
@@ -272,20 +299,26 @@ const appointment = {
                         connection.connect(err => {
                             if (err || cookie == 2) {
                                 fragError = 1;
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             }
                             connection.query(query, values, (err, results) => {
                                 if (err) {
                                     console.error("Error searching:", err);
                                     fragError = 1;
-                                    resolve();
+                                    connection.end(() => {
+                                        resolve();
+                                    });
                                 }
                                 for (let key in results) {
                                     if (results.hasOwnProperty(key)) {
                                         totalResults.push(results[key]);
                                     }
                                 }
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             });
                         });
                     });
@@ -330,14 +363,18 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         const query = `DELETE FROM appointments WHERE apptid = ?`;
                         centralConnection.query(query, appointmentId, (err, result) => {
                             if (err) {
                                 console.error("Error deleting row:", err);
                                 centralError = 1;
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log("Row deleted successfully.");
                         });
@@ -368,14 +405,18 @@ const appointment = {
                     connection.connect(err => {
                         if (err || hidden == 2) {
                             fragError = 1;
-                            resolve();
+                            connection.end(() => {
+                                resolve();
+                            });
                         }
                         const query = `DELETE FROM appointments WHERE apptid = ?`;
                         connection.query(query, appointmentId, (err, result) => {
                             if (err) {
                                 console.error("Error deleting row:", err);
                                 centralError = 1;
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log("Row deleted successfully.");
                         });
@@ -421,21 +462,27 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `SELECT * FROM appointments WHERE apptid = ?`;
                         centralConnection.query(query, [appointmentId], (err, results) => {
                             if (err) {
                                 console.error("Error searching for appointment:", err);
                                 centralError = 1;
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
                                     totalResults.push(results[key]);
                                 }
                             }
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         });
                     });
                 });
@@ -459,21 +506,27 @@ const appointment = {
                     connection.connect(err => {
                         if (err || hidden == 2) {
                             fragError = 1;
-                            resolve();
+                            connection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `SELECT * FROM appointments WHERE apptid = ?`;
                         connection.query(query, [appointmentId], (err, results) => {
                             if (err) {
                                 console.error("Error searching for appointment:", err);
                                 fragError = 1;
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
                                     totalResults.push(results[key]);
                                 }
                             }
-                            resolve();
+                            connection.end(() => {
+                                resolve();
+                            });
                         });
                     });
                 });
@@ -513,13 +566,18 @@ const appointment = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                         centralConnection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
                             if (err) {
                                 console.error('Failed to update row:', err);
                                 centralError = 1;
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log('Row updated successfully');
                         });
@@ -549,13 +607,18 @@ const appointment = {
                     connection.connect(err => {
                         if (err || hidden == 2) {
                             fragError = 1;
-                            resolve();
+                            connection.end(() => {
+                                resolve();
+                            });
                         }
                         let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                         connection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
                             if (err) {
                                 console.error('Failed to update row:', err);
                                 fragError = 1;
+                                connection.end(() => {
+                                    resolve();
+                                });
                             }
                             console.log('Row updated successfully');
                         });
