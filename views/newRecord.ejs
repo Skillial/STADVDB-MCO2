@@ -28,26 +28,26 @@
           <div class="container mt-3">
             <form id="insertData">
               <div class="col-lg-1 mb-3">
-                <label for="startHour" class="form-label">Start Hour</label>
-                <input type="number" class="form-control" id="startHour" min="1" max="24">
+                <label for="startHour" class="form-label"><strong>Start Hour</strong></label>
+                <input type="number" class="form-control" id="startHour" min="1" max="24" required>
               </div>
               <div class="row">
                 <div class="col mb-3">
-                  <label for="Status" class="form-label">Status</label>
-                  <select class="form-select" id="Status" aria-label="Appointment Status">
-                    <option selected disabled>Appointment Status</option>
+                  <label for="Status" class="form-label"><strong>Status</strong></label>
+                  <select class="form-select" id="Status" aria-label="Appointment Status" required>
+                    <option value="" hidden>Appointment Status</option>
                     <option value="Queued">Queued</option>
                     <option value="Serving">Serving</option>
-                    <option value="NoShow">NoShow</option>
+                    <option value="NoShow">No Show</option>
                     <option value="Complete">Complete</option>
                     <option value="Cancel">Cancel</option>
                     <option value="Skip">Skip</option>
                   </select>
                 </div>
                 <div class="col mb-3">
-                  <label for="Type" class="form-label">Type</label>
-                  <select class="form-select" id="Type" aria-label="Appointment Type">
-                    <option selected disabled>Appointment Type</option>
+                  <label for="Type" class="form-label"><strong>Type</strong></label>
+                  <select class="form-select" id="Type" aria-label="Appointment Type" required>
+                    <option value="" hidden>Appointment Type</option>
                     <option value="Consultation">Consultation</option>
                     <option value="Inpatient">Inpatient</option>
                   </select>
@@ -55,34 +55,34 @@
               </div>
               <div class="row">
                 <div class="col mb-3">
-                  <label for="Virtual" class="form-label">Virtual</label>
-                  <select class="form-select" id="Virtual" aria-label="Virtual Appointment">
-                    <option selected disabled>Is Virtual Appointment?</option>
+                  <label for="Virtual" class="form-label"><strong>Virtual</strong></label>
+                  <select class="form-select" id="Virtual" aria-label="Virtual Appointment" required>
+                    <option value="" hidden>Is Virtual Appointment?</option>
                     <option value="1">Yes</option>
                     <option value="0">No</option>
                   </select>
                 </div>
                 <div class="col mb-3">
-                  <label for="Hospital" class="form-label">Hospital</label>
-                  <select class="form-select" id="Hospital" aria-label="Is Hospital">
-                    <option selected disabled>Is Hospital?</option>
+                  <label for="Hospital" class="form-label"><strong>Hospital</strong></label>
+                  <select class="form-select" id="Hospital" aria-label="Is Hospital" required>
+                    <option value="" hidden>Is Hospital?</option>
                     <option value="1">Yes</option>
                     <option value="0">No</option>
                   </select>
                 </div>
               </div>
               <div class="mb-3">
-                <label for="City" class="form-label">City</label>
-                <input type="text" class="form-control" id="City">
+                <label for="City" class="form-label"><strong>City</strong></label>
+                <input type="text" class="form-control" id="City" required>
               </div>
               <div class="mb-3">
-                <label for="Province" class="form-label">Province</label>
-                <input type="text" class="form-control" id="Province">
+                <label for="Province" class="form-label"><strong>Province</strong></label>
+                <input type="text" class="form-control" id="Province" required>
               </div>
               <div class="mb-3">
-                <label for="Region" class="form-label">Region Name</label>
-                <select class="form-select" id="Region" aria-label="Region Name">
-                  <option selected disabled>Region Name</option>
+                <label for="Region" class="form-label"><strong>Region Name</strong></label>
+                <select class="form-select" id="Region" aria-label="Region Name" required>
+                  <option value="" hidden>Region Name</option>
                   <option disabled>Luzon</option>
                   <option value="Ilocos Region (I)">Ilocos Region (I)</option>
                   <option value="Cagayan Valley (II)">Cagayan Valley (II)</option>
@@ -106,12 +106,12 @@
                 </select>
               </div>
               <div class="col-lg-8 mb-3">
-                <label for="Specialty" class="form-label">Doctor Specialty</label>
-                <input type="text" class="form-control" id="Specialty">
+                <label for="Specialty" class="form-label"><strong>Doctor Specialty</strong></label>
+                <input type="text" class="form-control" id="Specialty" required>
               </div>
               <div class="col-lg-2 mb-3">
-                <label for="Age" class="form-label">Doctor Age</label>
-                <input type="number" class="form-control" id="Age" min="0" max="120">
+                <label for="Age" class="form-label"><strong>Doctor Age</strong></label>
+                <input type="number" class="form-control" id="Age" min="0" max="120" required>
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>

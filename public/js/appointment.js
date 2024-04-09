@@ -12,7 +12,8 @@ function displaySearchResults(data) {
 
     data.forEach(rowData => {
         const values = Object.values(rowData);
-        values.push('<a href="#" class="bi bi-pencil-square"></a>', '<a href="#" class="bi bi-trash-fill"></a>');
+        const apptid = rowData.apptid;
+        values.push(`<a href="#" class="bi bi-pencil-square" onclick="editRow(this, '${apptid}')"></a>`, `<a href="#" class="bi bi-trash-fill" onclick="deleteRow(this, '${apptid}')"></a>`);
         table.row.add(values).draw();
     });
 }
@@ -79,3 +80,48 @@ document.getElementById("searchFilter").addEventListener("submit", async functio
         // Optionally, display an error message to the user
     });
 });
+
+async function deleteRow(link, apptid) {
+    const id = apptid;
+    
+    if (confirm('Are you sure you want to delete this row?')) {
+        await fetch(`/deleteRow/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete row. Server returned ' + response.status + ': ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data.message);
+            // Remove the row from the table
+            const row = link.closest('tr');
+            row.remove();
+            // Reload the table data
+            const table = $('#table').DataTable();
+            const info = table.page.info();
+            const start = info.start + 1;
+            const rowCount = info.recordsTotal;
+            const end = Math.min(start + info.length - 1, rowCount);
+            $('#table_info').text(`Showing ${start} to ${end} of ${rowCount} entries`);
+            if (rowCount === 0) {
+                $('#table tbody').html('<tr><td colspan="' + table.columns().count() + '" class="text-center">No data available in table</td></tr>');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+        });
+    }
+}
+
+async function editRow(link, apptid) {
+    const id = apptid;
+
+    if (confirm('Are you sure you want to edit this row?')) {
+        window.location.href = `/editRecord/${id}`;
+    }
+    
+}
