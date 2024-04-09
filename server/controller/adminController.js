@@ -32,6 +32,7 @@ const admin = {
                             }
                         }
                         resolve();
+                        return;
                     });
                 });
             } catch (error) {

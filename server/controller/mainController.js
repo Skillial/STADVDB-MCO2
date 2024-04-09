@@ -20,6 +20,7 @@ const dashboard = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         // 0 = all, 1 = luzon, 2 = visayas and mindanao
                         if (mode === 0 || mode === 1) {
@@ -48,6 +49,7 @@ const dashboard = {
                         centralConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -66,6 +68,7 @@ const dashboard = {
                             luzonConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
                         luzonConnection.query(luzonQuery, (err, results) => {
@@ -76,6 +79,7 @@ const dashboard = {
                         luzonConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -91,6 +95,7 @@ const dashboard = {
                             visMinConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
                         visMinConnection.query(visayasQuery, (err, results) => {
@@ -108,6 +113,7 @@ const dashboard = {
                         visMinConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -180,6 +186,7 @@ const dashboard = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         } else {
                             centralConnection.query(sql, (err, result) => {
                                 if (err || req.cookies.Central == 2) {
@@ -187,6 +194,7 @@ const dashboard = {
                                     centralConnection.end(() => {
                                         resolve();
                                     });
+                                    return;
                                 }
 
                                 result.forEach(entry => {
@@ -196,6 +204,7 @@ const dashboard = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             });
                         }
                     });
@@ -223,6 +232,7 @@ const dashboard = {
                             connection.end(() => {
                                 resolve();
                             });
+                            return;
                         } else {
                             connection.query(sql, (err, result) => {
                                 if (err || hidden == 2) {
@@ -230,6 +240,7 @@ const dashboard = {
                                     connection.end(() => {
                                         resolve();
                                     });
+                                    return;
                                 }
 
                                 result.forEach(entry => {
@@ -239,6 +250,7 @@ const dashboard = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             });
                         }
                     });

@@ -35,6 +35,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                         centralConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
@@ -44,12 +45,14 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log("Data inserted successfully.");
                         });
                         centralConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -76,6 +79,7 @@ const appointment = {
                             fragConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                         fragConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
@@ -85,6 +89,7 @@ const appointment = {
                                 fragConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log("Data inserted successfully.");
 
@@ -92,6 +97,7 @@ const appointment = {
                         fragConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -131,6 +137,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
                         centralConnection.query(query, [appointmentId], (err, results) => {
@@ -140,6 +147,7 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
@@ -149,6 +157,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         });
                     });
                 });
@@ -176,6 +185,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
 
                             let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
@@ -186,6 +196,7 @@ const appointment = {
                                     connection.end(() => {
                                         resolve();
                                     });
+                                    return;
                                 }
                                 for (let key in results) {
                                     if (results.hasOwnProperty(key)) {
@@ -195,6 +206,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             });
                         });
                     });
@@ -259,6 +271,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         centralConnection.query(query, values, (err, results) => {
                             if (err) {
@@ -267,6 +280,7 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
@@ -276,6 +290,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         });
                     });
                 });
@@ -302,6 +317,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             connection.query(query, values, (err, results) => {
                                 if (err) {
@@ -310,6 +326,7 @@ const appointment = {
                                     connection.end(() => {
                                         resolve();
                                     });
+                                    return;
                                 }
                                 for (let key in results) {
                                     if (results.hasOwnProperty(key)) {
@@ -319,6 +336,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             });
                         });
                     });
@@ -366,6 +384,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         const query = `DELETE FROM appointments WHERE apptid = ?`;
                         centralConnection.query(query, appointmentId, (err, result) => {
@@ -375,6 +394,7 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log("Row deleted successfully.");
                         });
@@ -382,6 +402,7 @@ const appointment = {
                         centralConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -408,6 +429,7 @@ const appointment = {
                             connection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         const query = `DELETE FROM appointments WHERE apptid = ?`;
                         connection.query(query, appointmentId, (err, result) => {
@@ -417,6 +439,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log("Row deleted successfully.");
                         });
@@ -424,6 +447,7 @@ const appointment = {
                         connection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -465,6 +489,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `SELECT * FROM appointments WHERE apptid = ?`;
                         centralConnection.query(query, [appointmentId], (err, results) => {
@@ -474,6 +499,7 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
@@ -483,6 +509,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         });
                     });
                 });
@@ -509,6 +536,7 @@ const appointment = {
                             connection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `SELECT * FROM appointments WHERE apptid = ?`;
                         connection.query(query, [appointmentId], (err, results) => {
@@ -518,6 +546,7 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             for (let key in results) {
                                 if (results.hasOwnProperty(key)) {
@@ -527,6 +556,7 @@ const appointment = {
                             connection.end(() => {
                                 resolve();
                             });
+                            return;
                         });
                     });
                 });
@@ -569,6 +599,7 @@ const appointment = {
                             centralConnection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                         centralConnection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
@@ -578,12 +609,14 @@ const appointment = {
                                 centralConnection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log('Row updated successfully');
                         });
                         centralConnection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
@@ -610,6 +643,7 @@ const appointment = {
                             connection.end(() => {
                                 resolve();
                             });
+                            return;
                         }
                         let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                         connection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
@@ -619,12 +653,14 @@ const appointment = {
                                 connection.end(() => {
                                     resolve();
                                 });
+                                return;
                             }
                             console.log('Row updated successfully');
                         });
                         connection.end(() => {
                             resolve();
                         });
+                        return;
                     });
                 });
             } catch (error) {
