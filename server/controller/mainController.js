@@ -108,7 +108,7 @@ const dashboard = {
                 console.error(error);
             }
         }
-        if (req.cookies.mode === '1') {
+        if (req.cookies.mode == 1) {
             await centralNode(0);
             if (centralError == 1) {
                 await fragNode();
@@ -230,13 +230,25 @@ const dashboard = {
                 res.status(500).json({ error: 'An unexpected error occurred' });
             }
         }
-        await centralFetch();
-        if (centralError == 1){
+        
+        if (req.cookies.mode == 1){
+            await centralFetch();
+            if (centralError == 1){
+                await fragFetch();
+                if (fragError == 1){
+                    return res.json(none);
+                }
+            }
+        } else {
             await fragFetch();
             if (fragError == 1){
-                return res.json(none);
+                await centralFetch();
+                if (centralError == 1){
+                    return res.json(none);
+                }
             }
         }
+
         res.json(data);
 
     }
