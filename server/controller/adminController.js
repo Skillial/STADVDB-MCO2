@@ -31,7 +31,6 @@ const admin = {
                                 results.push(0);
                             }
                         }
-                        console.log("here")
                         resolve();
                     });
                 });
