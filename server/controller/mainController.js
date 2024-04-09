@@ -17,7 +17,9 @@ const dashboard = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         }
                         // 0 = all, 1 = luzon, 2 = visayas and mindanao
                         if (mode === 0 || mode === 1) {
@@ -61,7 +63,9 @@ const dashboard = {
                     luzonConnection.connect(err => {
                         if (err || req.cookies.Luz == 2) {
                             luzonError = 1;
-                            resolve();
+                            luzonConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
                         luzonConnection.query(luzonQuery, (err, results) => {
@@ -84,7 +88,9 @@ const dashboard = {
                     visMinConnection.connect(err => {
                         if (err || req.cookies.VisMin == 2) {
                             visMinError = 1;
-                            resolve();
+                            visMinConnection.end(() => {
+                                resolve();
+                            });
                         }
                         let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
                         visMinConnection.query(visayasQuery, (err, results) => {
@@ -171,19 +177,25 @@ const dashboard = {
                     centralConnection.connect(err => {
                         if (err || req.cookies.Central == 2) {
                             centralError = 1;
-                            resolve();
+                            centralConnection.end(() => {
+                                resolve();
+                            });
                         } else {
                             centralConnection.query(sql, (err, result) => {
                                 if (err || req.cookies.Central == 2) {
                                     centralError = 1;
-                                    resolve();
+                                    centralConnection.end(() => {
+                                        resolve();
+                                    });
                                 }
 
                                 result.forEach(entry => {
                                     data.labels.push(entry.MainSpecialty);
                                     data.values.push(entry.count);
                                 });
-                                resolve();
+                                centralConnection.end(() => {
+                                    resolve();
+                                });
                             });
                         }
                     });
@@ -208,19 +220,25 @@ const dashboard = {
                     connection.connect(err => {
                         if (err || hidden == 2) {
                             fragError = 1;
-                            resolve();
+                            connection.end(() => {
+                                resolve();
+                            });
                         } else {
                             connection.query(sql, (err, result) => {
                                 if (err || hidden == 2) {
                                     fragError = 1;
-                                    resolve();
+                                    connection.end(() => {
+                                        resolve();
+                                    });
                                 }
 
                                 result.forEach(entry => {
                                     data.labels.push(entry.MainSpecialty);
                                     data.values.push(entry.count);
                                 });
-                                resolve();
+                                connection.end(() => {
+                                    resolve();
+                                });
                             });
                         }
                     });
