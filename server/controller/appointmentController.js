@@ -38,22 +38,56 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                        centralConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error inserting data:", err);
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
                                 centralConnection.end(() => {
                                     resolve();
                                 });
                                 return;
                             }
-                            console.log("Data inserted successfully.");
+                            centralConnection.beginTransaction((err) => {
+
+                                if (err) {
+                                    centralConnection.rollback();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    centralConnection.end(() => {
+                                        resolve();
+                                    });
+                                    return;
+                                }
+                                let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                                centralConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
+                                    if (err) {
+                                        console.error("Error inserting data:", err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                        return;
+                                    }
+                                    console.log("Data inserted successfully.");
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end(() => {
+                                                resolve();
+                                            });
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                        return;
+                                    });
+                                });
+                            });
                         });
-                        centralConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -82,23 +116,50 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                        fragConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
+                        fragConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error inserting data:", err);
+                                fragConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 fragError = 1;
-                                fragConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            console.log("Data inserted successfully.");
-
+                            fragConnection.beginTransaction((err) => {
+                                if (err) {
+                                    fragConnection.rollback();
+                                    fragConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    fragError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                let query = `INSERT INTO appointments (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                                fragConnection.query(query, [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age], (err, result) => {
+                                    if (err) {
+                                        console.error("Error inserting data:", err);
+                                        fragError = 1;
+                                        fragConnection.rollback();
+                                        fragConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    console.log("Data inserted successfully.");
+                                    fragConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            fragError = 1;
+                                            fragConnection.rollback();
+                                            fragConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        fragConnection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                });
+                            });
                         });
-                        fragConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -117,6 +178,7 @@ const appointment = {
             return res.status(500).json({ message: "Error inserting data." });
         } else if (centralError == 1) {
             // add to frag log
+
             let connection = createConnection(DB_PORTS[nodeToInsert]);
             connection.connect(err => {
                 if (err) {
@@ -199,25 +261,54 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
-                        centralConnection.query(query, [appointmentId], (err, results) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error searching for appointment:", err);
+                                centralConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            for (let key in results) {
-                                if (results.hasOwnProperty(key)) {
-                                    totalResults.push(results[key]);
+                            centralConnection.beginTransaction((err) => {
+                                if (err) {
+                                    centralConnection.rollback();
+                                    centralConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
                                 }
-                            }
-                            centralConnection.end(() => {
-                                resolve();
+                                let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
+                                centralConnection.query(query, [appointmentId], (err, results) => {
+                                    if (err) {
+                                        console.error("Error searching for appointment:", err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    for (let key in results) {
+                                        if (results.hasOwnProperty(key)) {
+                                            totalResults.push(results[key]);
+                                        }
+                                    }
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                        return;
+                                    });
+                                });
                             });
-                            return;
                         });
                     });
                 });
@@ -247,26 +338,53 @@ const appointment = {
                                 });
                                 return;
                             }
-
-                            let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
-                            connection.query(query, [appointmentId], (err, results) => {
+                            connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                                 if (err) {
-                                    console.error("Error searching for appointment:", err);
+                                    connection.end();
+                                    console.error("Error setting isolation level:", err);
                                     fragError = 1;
-                                    connection.end(() => {
-                                        resolve();
-                                    });
+                                    resolve();
                                     return;
                                 }
-                                for (let key in results) {
-                                    if (results.hasOwnProperty(key)) {
-                                        totalResults.push(results[key]);
+                                connection.beginTransaction((err) => {
+                                    if (err) {
+                                        connection.rollback();
+                                        connection.end();
+                                        console.error("Error starting transaction:", err);
+                                        fragError = 1;
+                                        resolve();
+                                        return;
                                     }
-                                }
-                                connection.end(() => {
-                                    resolve();
+                                    let query = `SELECT * FROM appointments WHERE apptid REGEXP ?`;
+                                    connection.query(query, [appointmentId], (err, results) => {
+                                        if (err) {
+                                            console.error("Error searching for appointment:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        for (let key in results) {
+                                            if (results.hasOwnProperty(key)) {
+                                                totalResults.push(results[key]);
+                                            }
+                                        }
+                                        connection.commit((err) => {
+                                            if (err) {
+                                                console.error("Error committing transaction:", err);
+                                                fragError = 1;
+                                                connection.rollback();
+                                                connection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            connection.end(() => {
+                                                resolve();
+                                            });
+                                        });
+                                    });
                                 });
-                                return;
                             });
                         });
                     });
@@ -334,24 +452,53 @@ const appointment = {
                             });
                             return;
                         }
-                        centralConnection.query(query, values, (err, results) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error searching:", err);
+                                centralConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            for (let key in results) {
-                                if (results.hasOwnProperty(key)) {
-                                    totalResults.push(results[key]);
+                            centralConnection.beginTransaction({ isolationLevel: 'SERIALIZABLE' }, async (err) => {
+                                if (err) {
+                                    centralConnection.rollback();
+                                    centralConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
                                 }
-                            }
-                            centralConnection.end(() => {
-                                resolve();
+                                centralConnection.query(query, values, (err, results) => {
+                                    if (err) {
+                                        console.error("Error searching:", err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    for (let key in results) {
+                                        if (results.hasOwnProperty(key)) {
+                                            totalResults.push(results[key]);
+                                        }
+                                    }
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                            return;
+                                        });
+                                    });
+                                });
                             });
-                            return;
                         });
                     });
                 });
@@ -380,29 +527,55 @@ const appointment = {
                                 });
                                 return;
                             }
-                            connection.query(query, values, (err, results) => {
+                            connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                                 if (err) {
-                                    console.error("Error searching:", err);
+                                    connection.end();
+                                    console.error("Error setting isolation level:", err);
                                     fragError = 1;
-                                    connection.end(() => {
-                                        resolve();
-                                    });
+                                    resolve();
                                     return;
                                 }
-                                for (let key in results) {
-                                    if (results.hasOwnProperty(key)) {
-                                        totalResults.push(results[key]);
+                                connection.beginTransaction((err) => {
+                                    if (err) {
+                                        connection.rollback();
+                                        connection.end();
+                                        console.error("Error starting transaction:", err);
+                                        fragError = 1;
+                                        resolve();
+                                        return;
                                     }
-                                }
-                                connection.end(() => {
-                                    resolve();
+                                    connection.query(query, values, (err, results) => {
+                                        if (err) {
+                                            console.error("Error searching:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        for (let key in results) {
+                                            if (results.hasOwnProperty(key)) {
+                                                totalResults.push(results[key]);
+                                            }
+                                        }
+                                        connection.commit((err) => {
+                                            if (err) {
+                                                console.error("Error committing transaction:", err);
+                                                fragError = 1;
+                                                connection.rollback();
+                                                connection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            connection.end(() => {
+                                                resolve();
+                                            });
+                                        });
+                                    });
                                 });
-                                return;
                             });
                         });
                     });
-
-
                 } catch (error) {
                     console.error(error);
                 }
@@ -448,23 +621,50 @@ const appointment = {
                             });
                             return;
                         }
-                        const query = `DELETE FROM appointments WHERE apptid = ?`;
-                        centralConnection.query(query, appointmentId, (err, result) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error deleting row:", err);
+                                centralConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            console.log("Row deleted successfully.");
+                            centralConnection.beginTransaction((err) => {
+                                if (err) {
+                                    centralConnection.rollback();
+                                    centralConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                const query = `DELETE FROM appointments WHERE apptid = ?`;
+                                centralConnection.query(query, appointmentId, (err, result) => {
+                                    if (err) {
+                                        console.error("Error deleting row:", err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    console.log("Row deleted successfully.");
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                });
+                            });
                         });
-
-                        centralConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -493,23 +693,50 @@ const appointment = {
                             });
                             return;
                         }
-                        const query = `DELETE FROM appointments WHERE apptid = ?`;
-                        connection.query(query, appointmentId, (err, result) => {
+                        connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error deleting row:", err);
-                                centralError = 1;
-                                connection.end(() => {
-                                    resolve();
-                                });
+                                connection.end();
+                                console.error("Error setting isolation level:", err);
+                                fragError = 1;
+                                resolve();
                                 return;
                             }
-                            console.log("Row deleted successfully.");
+                            connection.beginTransaction((err) => {
+                                if (err) {
+                                    connection.rollback();
+                                    connection.end();
+                                    console.error("Error starting transaction:", err);
+                                    fragError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                const query = `DELETE FROM appointments WHERE apptid = ?`;
+                                connection.query(query, appointmentId, (err, result) => {
+                                    if (err) {
+                                        console.error("Error deleting row:", err);
+                                        centralError = 1;
+                                        connection.rollback();
+                                        connection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    console.log("Row deleted successfully.");
+                                    connection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        connection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                });
+                            });
                         });
-
-                        connection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -545,7 +772,7 @@ const appointment = {
                         return;
                     }
                     maxId = maxResult[0]['MAX(ID)'];
-                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINL", "SENTINEL", "SENTINEL", "-1", "DELETE", "0", maxId + 1];
+                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINEL", "SENTINEL", "SENTINEL", "-1", "DELETE", "0", maxId + 1];
                     let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                     connection.query(query, values, (err, result) => {
                         if (err) {
@@ -576,7 +803,7 @@ const appointment = {
                         return;
                     }
                     maxId = maxResult[0]['MAX(ID)'];
-                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINL", "SENTINEL", "SENTINEL", "-1", "DELETE", nodetoDelete.toString(), maxId + 1];
+                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINEL", "SENTINEL", "SENTINEL", "-1", "DELETE", nodetoDelete.toString(), maxId + 1];
                     let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                     connection.query(query, values, (err, result) => {
                         if (err) {
@@ -612,25 +839,53 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `SELECT * FROM appointments WHERE apptid = ?`;
-                        centralConnection.query(query, [appointmentId], (err, results) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error searching for appointment:", err);
+                                centralConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            for (let key in results) {
-                                if (results.hasOwnProperty(key)) {
-                                    totalResults.push(results[key]);
+                            centralConnection.beginTransaction((err) => {
+                                if (err) {
+                                    centralConnection.rollback();
+                                    centralConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
                                 }
-                            }
-                            centralConnection.end(() => {
-                                resolve();
+                                let query = `SELECT * FROM appointments WHERE apptid = ?`;
+                                centralConnection.query(query, [appointmentId], (err, results) => {
+                                    if (err) {
+                                        console.error("Error searching for appointment:", err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    for (let key in results) {
+                                        if (results.hasOwnProperty(key)) {
+                                            totalResults.push(results[key]);
+                                        }
+                                    }
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                });
                             });
-                            return;
                         });
                     });
                 });
@@ -659,25 +914,54 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `SELECT * FROM appointments WHERE apptid = ?`;
-                        connection.query(query, [appointmentId], (err, results) => {
+                        connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error("Error searching for appointment:", err);
+                                connection.end();
+                                console.error("Error setting isolation level:", err);
                                 fragError = 1;
-                                connection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            for (let key in results) {
-                                if (results.hasOwnProperty(key)) {
-                                    totalResults.push(results[key]);
+                            connection.beginTransaction((err) => {
+                                if (err) {
+                                    connection.rollback();
+                                    connection.end();
+                                    console.error("Error starting transaction:", err);
+                                    fragError = 1;
+                                    resolve();
+                                    return;
                                 }
-                            }
-                            connection.end(() => {
-                                resolve();
+                                let query = `SELECT * FROM appointments WHERE apptid = ?`;
+                                connection.query(query, [appointmentId], (err, results) => {
+                                    if (err) {
+                                        console.error("Error searching for appointment:", err);
+                                        fragError = 1;
+                                        connection.rollback();
+                                        connection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    for (let key in results) {
+                                        if (results.hasOwnProperty(key)) {
+                                            totalResults.push(results[key]);
+                                        }
+                                    }
+                                    connection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        connection.end(() => {
+                                            resolve();
+                                        });
+                                        return;
+                                    });
+                                });
                             });
-                            return;
                         });
                     });
                 });
@@ -723,22 +1007,50 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
-                        centralConnection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error('Failed to update row:', err);
+                                centralConnection.end();
+                                console.error("Error setting isolation level:", err);
                                 centralError = 1;
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            console.log('Row updated successfully');
+                            centralConnection.beginTransaction((err) => {
+                                if (err) {
+                                    centralConnection.rollback();
+                                    centralConnection.end();
+                                    console.error("Error starting transaction:", err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
+                                centralConnection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
+                                    if (err) {
+                                        console.error('Failed to update row:', err);
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    console.log('Row updated successfully');
+                                    centralConnection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            centralError = 1;
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        centralConnection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                }); 
+                            });
                         });
-                        centralConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -767,22 +1079,51 @@ const appointment = {
                             });
                             return;
                         }
-                        let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
-                        connection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
+                        connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
                             if (err) {
-                                console.error('Failed to update row:', err);
+                                connection.end();
+                                console.error("Error setting isolation level:", err);
                                 fragError = 1;
-                                connection.end(() => {
-                                    resolve();
-                                });
+                                resolve();
                                 return;
                             }
-                            console.log('Row updated successfully');
+                            connection.beginTransaction((err) => {
+                                if (err) {
+                                    connection.rollback();
+                                    connection.end();
+                                    console.error("Error starting transaction:", err);
+                                    fragError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
+                                connection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
+                                    if (err) {
+                                        console.error('Failed to update row:', err);
+                                        fragError = 1;
+                                        connection.rollback();
+                                        connection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    console.log('Row updated successfully');
+                                    connection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        connection.end(() => {
+                                            resolve();
+                                        });
+                                    });
+                                });
+
+                            });
                         });
-                        connection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {

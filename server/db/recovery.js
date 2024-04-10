@@ -9,6 +9,13 @@ function recovery() {
                 connection.end();
                 return;
             }
+            connection.query("LOCK TABLES appointment_log WRITE", (err, result) => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+            });
             let query = `SELECT MAX(ID) FROM appointment_log`;
             connection.query(query, (err, maxResult) => {
                 if (err) {
@@ -69,6 +76,13 @@ function recovery() {
                     });
                 }
 
+            });
+            connection.query("UNLOCK TABLES", (err, result) => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
             });
         });
     }

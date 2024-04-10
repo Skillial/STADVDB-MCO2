@@ -23,34 +23,62 @@ const dashboard = {
                             });
                             return;
                         }
-                        // 0 = all, 1 = luzon, 2 = visayas and mindanao
-                        if (mode === 0 || mode === 1) {
-                            let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
-                            centralConnection.query(luzonQuery, (err, results) => {
-                                if (!err && results.length > 0) {
-                                    luzonCount = results[0].count;
+                        centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
+                            if (err) {
+                                centralConnection.end();
+                                console.error(err);
+                                centralError = 1;
+                                resolve();
+                                return;
+                            }
+                            centralConnection.beginTransaction(err => {
+                                if (err) {
+                                    centralConnection.rollback()
+                                    centralConnection.end();
+                                    console.error(err);
+                                    centralError = 1;
+                                    resolve();
+                                    return;
                                 }
-                            });
-                        }
-                        if (mode === 0 || mode === 2) {
-                            let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
-                            centralConnection.query(visayasQuery, (err, results) => {
-                                if (!err && results.length > 0) {
-                                    visayasCount = results[0].count;
+                                // 0 = all, 1 = luzon, 2 = visayas and mindanao
+                                if (mode === 0 || mode === 1) {
+                                    let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
+                                    centralConnection.query(luzonQuery, (err, results) => {
+                                        if (!err && results.length > 0) {
+                                            luzonCount = results[0].count;
+                                        }
+                                    });
                                 }
-                            });
+                                if (mode === 0 || mode === 2) {
+                                    let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
+                                    centralConnection.query(visayasQuery, (err, results) => {
+                                        if (!err && results.length > 0) {
+                                            visayasCount = results[0].count;
+                                        }
+                                    });
 
-                            let mindanaoQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${MINDANAO.map(region => `'${region}'`).join(', ')});`;
-                            centralConnection.query(mindanaoQuery, (err, results) => {
-                                if (!err && results.length > 0) {
-                                    mindanaoCount = results[0].count;
+                                    let mindanaoQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${MINDANAO.map(region => `'${region}'`).join(', ')});`;
+                                    centralConnection.query(mindanaoQuery, (err, results) => {
+                                        if (!err && results.length > 0) {
+                                            mindanaoCount = results[0].count;
+                                        }
+                                    });
                                 }
+                                centralConnection.commit(err => {
+                                    if (err) {
+                                        centralError = 1;
+                                        centralConnection.rollback();
+                                        centralConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    centralConnection.end(() => {
+                                        resolve();
+                                    });
+                                    return;
+                                });
                             });
-                        }
-                        centralConnection.end(() => {
-                            resolve();
                         });
-                        return;
                     });
                 });
             } catch (error) {
@@ -71,16 +99,47 @@ const dashboard = {
                             });
                             return;
                         }
-                        let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
-                        luzonConnection.query(luzonQuery, (err, results) => {
-                            if (!err && results.length > 0) {
-                                luzonCount = results[0].count;
+                        luzonConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
+                            if (err) {
+                                luzonConnection.end();
+                                console.error(err);
+                                luzonError = 1;
+                                resolve();
+                                return;
                             }
+                            luzonConnection.beginTransaction(err => {
+                                if (err) {
+                                    luzonConnection.rollback()
+                                    luzonConnection.end();
+                                    console.error(err);
+                                    luzonError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                let luzonQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${LUZON.map(region => `'${region}'`).join(', ')});`;
+                                luzonConnection.query(luzonQuery, (err, results) => {
+                                    if (!err && results.length > 0) {
+                                        luzonCount = results[0].count;
+                                        luzonConnection.commit(err => {
+                                            if (err) {
+                                                console.error(err);
+                                                luzonError = 1;
+                                                luzonConnection.rollback();
+                                                luzonConnection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            luzonConnection.end();
+                                            resolve();
+                                            return;
+                                        });
+                                    } else {
+                                        luzonConnection.end()
+                                        resolve();
+                                    }
+                                });
+                            });
                         });
-                        luzonConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -97,23 +156,52 @@ const dashboard = {
                             });
                             return;
                         }
-                        let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
-                        visMinConnection.query(visayasQuery, (err, results) => {
-                            if (!err && results.length > 0) {
-                                visayasCount = results[0].count;
+                        visMinConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
+                            if (err) {
+                                visMinConnection.end();
+                                console.error(err);
+                                visMinError = 1;
+                                resolve();
+                                return;
                             }
-                        });
+                            visMinConnection.beginTransaction(err => {
+                                if (err) {
+                                    visMinConnection.rollback()
+                                    visMinConnection.end();
+                                    console.error(err);
+                                    visMinError = 1;
+                                    resolve();
+                                    return;
+                                }
+                                let visayasQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${VISAYAS.map(region => `'${region}'`).join(', ')});`;
+                                visMinConnection.query(visayasQuery, (err, results) => {
+                                    if (!err && results.length > 0) {
+                                        visayasCount = results[0].count;
+                                    }
+                                });
 
-                        let mindanaoQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${MINDANAO.map(region => `'${region}'`).join(', ')});`;
-                        visMinConnection.query(mindanaoQuery, (err, results) => {
-                            if (!err && results.length > 0) {
-                                mindanaoCount = results[0].count;
-                            }
+                                let mindanaoQuery = `SELECT COUNT(*) as count FROM appointments WHERE RegionName IN (${MINDANAO.map(region => `'${region}'`).join(', ')});`;
+                                visMinConnection.query(mindanaoQuery, (err, results) => {
+                                    if (!err && results.length > 0) {
+                                        mindanaoCount = results[0].count;
+                                    }
+                                });
+                                visMinConnection.commit(err => {
+                                    if (err) {
+                                        console.log(err)
+                                        visMinError = 1;
+                                        visMinConnection.rollback();
+                                        visMinConnection.end();
+                                        resolve();
+                                        return;
+                                    }
+                                    visMinConnection.end(() => {
+                                        resolve();
+                                    });
+                                    return;
+                                });
+                            });
                         });
-                        visMinConnection.end(() => {
-                            resolve();
-                        });
-                        return;
                     });
                 });
             } catch (error) {
@@ -190,23 +278,53 @@ const dashboard = {
                             });
                             return;
                         } else {
-                            centralConnection.query(sql, (err, result) => {
-                                if (err || req.cookies.Central == 2) {
+                            centralConnection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
+                                if (err) {
+                                    centralConnection.end();
+                                    console.error(err);
                                     centralError = 1;
-                                    centralConnection.end(() => {
-                                        resolve();
-                                    });
+                                    resolve();
                                     return;
                                 }
+                                centralConnection.beginTransaction(err => {
+                                    if (err) {
+                                        centralConnection.rollback()
+                                        centralConnection.end();
+                                        console.error(err);
+                                        centralError = 1;
+                                        resolve();
+                                        return;
+                                    }
+                                    centralConnection.query(sql, (err, result) => {
+                                        if (err || req.cookies.Central == 2) {
+                                            centralError = 1;
+                                            console.error(err);
+                                            centralConnection.rollback();
+                                            centralConnection.end();
+                                            resolve();
+                                            return;
+                                        }
 
-                                result.forEach(entry => {
-                                    data.labels.push(entry.MainSpecialty);
-                                    data.values.push(entry.count);
+                                        result.forEach(entry => {
+                                            data.labels.push(entry.MainSpecialty);
+                                            data.values.push(entry.count);
+                                        });
+                                        centralConnection.commit(err => {
+                                            if (err) {
+                                                console.log(err)
+                                                centralError = 1;
+                                                centralConnection.rollback();
+                                                centralConnection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            centralConnection.end(() => {
+                                                resolve();
+                                            });
+                                            return;
+                                        });
+                                    });
                                 });
-                                centralConnection.end(() => {
-                                    resolve();
-                                });
-                                return;
                             });
                         }
                     });
@@ -236,23 +354,53 @@ const dashboard = {
                             });
                             return;
                         } else {
-                            connection.query(sql, (err, result) => {
-                                if (err || hidden == 2) {
+                            connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', (err) => {
+                                if (err) {
+                                    connection.end();
+                                    console.error(err);
                                     fragError = 1;
-                                    connection.end(() => {
-                                        resolve();
-                                    });
+                                    resolve();
                                     return;
                                 }
+                                connection.beginTransaction(err => {
+                                    if (err) {
+                                        connection.rollback()
+                                        connection.end();
+                                        console.error(err);
+                                        fragError = 1;
+                                        resolve();
+                                        return;
+                                    }
+                                    connection.query(sql, (err, result) => {
+                                        if (err || hidden == 2) {
+                                            fragError = 1;
+                                            console.error(err);
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
 
-                                result.forEach(entry => {
-                                    data.labels.push(entry.MainSpecialty);
-                                    data.values.push(entry.count);
+                                        result.forEach(entry => {
+                                            data.labels.push(entry.MainSpecialty);
+                                            data.values.push(entry.count);
+                                        });
+                                        connection.commit(err => {
+                                            if (err) {
+                                                console.log(err)
+                                                fragError = 1;
+                                                connection.rollback();
+                                                connection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            connection.end(() => {
+                                                resolve();
+                                            });
+                                            return;
+                                        });
+                                    });
                                 });
-                                connection.end(() => {
-                                    resolve();
-                                });
-                                return;
                             });
                         }
                     });
