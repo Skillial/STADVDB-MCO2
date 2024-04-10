@@ -5,7 +5,6 @@ function recovery() {
         let connection = createConnection(DB_PORTS[i]);
         connection.connect(err => {
             if (err) {
-                console.log(err);
                 connection.end();
                 return;
             }
@@ -68,11 +67,12 @@ function recovery() {
                                             return;
                                         }
                                         console.log("Deleted from log");
-                                        connection.end();
+
                                     });
                                 });
                             });
                         });
+                        connection.end();
                     });
                 }
 

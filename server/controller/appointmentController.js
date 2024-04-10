@@ -993,8 +993,7 @@ const appointment = {
 
     updateRecord: async (req, res) => {
         const { id, startHour, Status, Type, Virtual, Hospital, City, Province, Region, Specialty, Age } = req.body;
-        let centralError = 0, fragError = 0, nodetoUpdate = -1;
-
+        let centralError = 0, fragError = 0, nodetoUpdate = -1;     
         async function updateCentral() {
             let centralConnection = createConnection(DB_PORTS[0]);
             try {
