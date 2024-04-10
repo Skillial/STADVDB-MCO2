@@ -1,6 +1,7 @@
 const { cookieChecker } = require('./../checker/cookie');
 const { createConnection, DB_PORTS } = require('./../db/config');
 const { LUZON, VISAYAS, MINDANAO } = require('./../db/region');
+const { recovery } = require('./../db/recovery');
 
 const appointment = {
 
@@ -104,6 +105,7 @@ const appointment = {
                 console.error(error);
             }
         }
+        recovery();
         if (req.cookies.mode == 1) {
             await insertCentral();
             await insertFrag();
@@ -115,8 +117,66 @@ const appointment = {
             return res.status(500).json({ message: "Error inserting data." });
         } else if (centralError == 1) {
             // add to frag log
+            let connection = createConnection(DB_PORTS[nodeToInsert]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, "INSERT", "0", maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         } else if (fragError == 1) {
             // add to central log
+            let connection = createConnection(DB_PORTS[0]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, "INSERT", nodeToInsert.toString(), maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         }
         res.json({ message: "Data inserted successfully." });
 
@@ -216,6 +276,7 @@ const appointment = {
             }
             return totalResults
         }
+        recovery();
         let results = []
         if (req.cookies.mode == 1) {
             results = await searchCentral();
@@ -348,6 +409,7 @@ const appointment = {
             }
             return totalResults;
         }
+        recovery();
         let results = []
         if (req.cookies.mode == 1) {
             results = await centralFilter();
@@ -372,7 +434,7 @@ const appointment = {
     deleteRow: async (req, res) => {
         const appointmentId = req.params.id;
         const RegionName = req.params.RegionName;
-        let centralError = 0, fragError = 0;
+        let centralError = 0, fragError = 0, nodetoDelete = -1;
 
         async function deleteCentral() {
             const centralConnection = createConnection(DB_PORTS[0]);
@@ -411,7 +473,7 @@ const appointment = {
         }
 
         async function deleteFrag() {
-            let connection, hidden, nodetoDelete;
+            let connection, hidden;
             if (LUZON.includes(RegionName)) {
                 connection = createConnection(DB_PORTS[1]);
                 hidden = req.cookies.Luz;
@@ -454,6 +516,7 @@ const appointment = {
                 console.error(error);
             }
         }
+        recovery();
         if (req.cookies.mode == 1) {
             await deleteCentral();
             await deleteFrag();
@@ -466,8 +529,66 @@ const appointment = {
             return res.status(500).json({ message: "Error deleting row." });
         } else if (centralError == 1) {
             // add to frag log
+            let connection = createConnection(DB_PORTS[nodetoDelete]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINL", "SENTINEL", "SENTINEL", "-1", "DELETE", "0", maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         } else if (fragError == 1) {
             // add to central log
+            let connection = createConnection(DB_PORTS[0]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [appointmentId, "SENTINEL", -1, "SENTINEL", 0, 0, "SENTINEL", "SENTINL", "SENTINEL", "SENTINEL", "-1", "DELETE", nodetoDelete.toString(), maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         }
         res.json({ message: "Row deleted successfully." });
 
@@ -564,6 +685,7 @@ const appointment = {
                 console.error(error);
             }
         }
+        recovery();
         if (req.cookies.mode == 1) {
             await centralRecord();
             if (centralError == 1) {
@@ -587,7 +709,7 @@ const appointment = {
 
     updateRecord: async (req, res) => {
         const { id, startHour, Status, Type, Virtual, Hospital, City, Province, Region, Specialty, Age } = req.body;
-        let centralError = 0, fragError = 0;
+        let centralError = 0, fragError = 0, nodetoUpdate = -1;
 
         async function updateCentral() {
             let centralConnection = createConnection(DB_PORTS[0]);
@@ -625,7 +747,7 @@ const appointment = {
         }
 
         async function updateFrag() {
-            let connection, hidden, nodetoUpdate;
+            let connection, hidden;
             if (LUZON.includes(Region)) {
                 connection = createConnection(DB_PORTS[1]);
                 hidden = req.cookies.Luz;
@@ -667,6 +789,7 @@ const appointment = {
                 console.error(error);
             }
         }
+        recovery();
         if (req.cookies.mode == 1) {
             await updateCentral();
             await updateFrag();
@@ -679,8 +802,66 @@ const appointment = {
             return res.status(500).json({ error: 'Failed to update row' });
         } else if (centralError == 1) {
             // add to frag log
+            let connection = createConnection(DB_PORTS[nodetoUpdate]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, "UPDATE", "0", maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         } else if (fragError == 1) {
             // add to central log
+            let connection = createConnection(DB_PORTS[0]);
+            connection.connect(err => {
+                if (err) {
+                    console.log(err);
+                    connection.end();
+                    return;
+                }
+                let idquery = `SELECT MAX(ID) FROM appointment_log`;
+                let maxId;
+                connection.query(idquery, (err, maxResult) => {
+                    if (err) {
+                        console.log(err);
+                        connection.end();
+                        return;
+                    }
+                    maxId = maxResult[0]['MAX(ID)'];
+                    values = [id, Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, "UPDATE", nodetoUpdate.toString(), maxId + 1];
+                    let query = `INSERT INTO appointment_log (apptid, status, StartHour, type, \`Virtual\`, IsHospital, City, Province, RegionName, MainSpecialty, DoctorAge, Query, Node, ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    connection.query(query, values, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                        console.log("Inserted to log");
+                        connection.end();
+                    });
+                });
+            });
         }
         res.json({ message: 'Row updated successfully' });
 

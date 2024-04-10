@@ -1,6 +1,7 @@
 const { createConnection, DB_PORTS } = require('./../db/config');
 const { LUZON, VISAYAS, MINDANAO } = require('./../db/region');
 const { cookieChecker } = require('./../checker/cookie');
+const { recovery } = require('./../db/recovery');
 
 const dashboard = {
 
@@ -85,7 +86,6 @@ const dashboard = {
             } catch (error) {
                 console.error(error);
             }
-
             let visMinConnection = createConnection(DB_PORTS[2]);
             try {
                 await new Promise((resolve) => {
@@ -120,6 +120,8 @@ const dashboard = {
                 console.error(error);
             }
         }
+
+        recovery();
         if (req.cookies.mode == 1) {
             await centralNode(0);
             if (centralError == 1) {
@@ -172,7 +174,7 @@ const dashboard = {
         let sql = `SELECT MainSpecialty, COUNT(*) AS count FROM appointments WHERE RegionName = '${RegionName}' GROUP BY MainSpecialty`;
         const none = [];
         let centralError = 0, fragError = 0;
-        let  data = {
+        let data = {
             labels: [],
             values: []
         };;
@@ -260,20 +262,20 @@ const dashboard = {
                 res.status(500).json({ error: 'An unexpected error occurred' });
             }
         }
-        
-        if (req.cookies.mode == 1){
+        recovery();
+        if (req.cookies.mode == 1) {
             await centralFetch();
-            if (centralError == 1){
+            if (centralError == 1) {
                 await fragFetch();
-                if (fragError == 1){
+                if (fragError == 1) {
                     return res.json(none);
                 }
             }
         } else {
             await fragFetch();
-            if (fragError == 1){
+            if (fragError == 1) {
                 await centralFetch();
-                if (centralError == 1){
+                if (centralError == 1) {
                     return res.json(none);
                 }
             }

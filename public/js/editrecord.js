@@ -34,7 +34,7 @@ document.getElementById('editData').addEventListener('submit', async function(ev
     .then(data => {
         console.log('Row updated successfully:', data);
         alert('Row updated successfully');
-        window.location.href = `/editRecord/${id}`;
+        window.location.href = `/editRecord/${id}/${Region.value}`;
     })
     .catch(error => {
         // Handle error response
