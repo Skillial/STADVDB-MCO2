@@ -1,8 +1,8 @@
 
 
-document.getElementById('editData').addEventListener('submit', async function(event) {
+document.getElementById('editData').addEventListener('submit', async function (event) {
     event.preventDefault();
-    
+
     const id = document.getElementById('apptid').value;
     const formData = {
         id: document.getElementById('apptid').value,
@@ -25,21 +25,25 @@ document.getElementById('editData').addEventListener('submit', async function(ev
         },
         body: JSON.stringify(formData)
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to update row');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Row updated successfully:', data);
-        alert('Row updated successfully');
-        window.location.href = `/editRecord/${id}/${Region.value}`;
-    })
-    .catch(error => {
-        // Handle error response
-        console.error('Failed to update row:', error);
-        // Display error message to the user
-        // Example: document.getElementById('errorMessage').textContent = 'Failed to update row. Please try again.';
-    });
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 501) {
+                    alert('Data was deleted');
+                    window.location.href = `/appointment`;
+                } 
+                throw new Error('Failed to update row');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data)
+            alert('Row updated successfully');
+            window.location.href = `/editRecord/${id}/${Region.value}`;
+        })
+        .catch(error => {
+            // Handle error response
+            console.error('Failed to update row:', error);
+            // Display error message to the user
+            // Example: document.getElementById('errorMessage').textContent = 'Failed to update row. Please try again.';
+        });
 });

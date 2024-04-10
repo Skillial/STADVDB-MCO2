@@ -607,7 +607,7 @@ const appointment = {
     deleteRow: async (req, res) => {
         const appointmentId = req.params.id;
         const RegionName = req.params.RegionName;
-        let centralError = 0, fragError = 0, nodetoDelete = -1;
+        let centralError = 0, fragError = 0, nodetoDelete = -1, noUpdate = 0;
 
         async function deleteCentral() {
             const centralConnection = createConnection(DB_PORTS[0]);
@@ -640,7 +640,11 @@ const appointment = {
                                 }
                                 const query = `DELETE FROM appointments WHERE apptid = ?`;
                                 centralConnection.query(query, appointmentId, (err, result) => {
-                                    if (err) {
+                                    if (err || (result['changedRows'] == 0 && result['affectedRows'] == 0)) {
+                                        if (result['changedRows'] == 0 && result['affectedRows'] == 0) {
+                                            noUpdate = 1;
+                                        }
+                                        console.log("central")
                                         console.error("Error deleting row:", err);
                                         centralError = 1;
                                         centralConnection.rollback();
@@ -712,9 +716,13 @@ const appointment = {
                                 }
                                 const query = `DELETE FROM appointments WHERE apptid = ?`;
                                 connection.query(query, appointmentId, (err, result) => {
-                                    if (err) {
+                                    if (err || (result['changedRows'] == 0 && result['affectedRows'] == 0)) {
+                                        if (result['changedRows'] == 0 && result['affectedRows'] == 0) {
+                                            noUpdate = 1;
+                                        }
+                                        console.log("Fragment")
                                         console.error("Error deleting row:", err);
-                                        centralError = 1;
+                                        fragError = 1;
                                         connection.rollback();
                                         connection.end();
                                         resolve();
@@ -751,8 +759,10 @@ const appointment = {
             await deleteFrag();
             await deleteCentral();
         }
-
         if (centralError == 1 && fragError == 1) {
+            if (noUpdate == 1) {
+                return res.status(501).json({ error: 'No rows were deleted' });
+            }
             return res.status(500).json({ message: "Error deleting row." });
         } else if (centralError == 1) {
             // add to frag log
@@ -993,7 +1003,7 @@ const appointment = {
 
     updateRecord: async (req, res) => {
         const { id, startHour, Status, Type, Virtual, Hospital, City, Province, Region, Specialty, Age } = req.body;
-        let centralError = 0, fragError = 0, nodetoUpdate = -1;     
+        let centralError = 0, fragError = 0, nodetoUpdate = -1, noUpdate = 0;
         async function updateCentral() {
             let centralConnection = createConnection(DB_PORTS[0]);
             try {
@@ -1025,7 +1035,10 @@ const appointment = {
                                 }
                                 let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                                 centralConnection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
-                                    if (err) {
+                                    if (err || (result['changedRows'] == 0 && result['affectedRows'] == 0)) {
+                                        if (result['changedRows'] == 0 && result['affectedRows'] == 0) {
+                                            noUpdate = 1;
+                                        }
                                         console.error('Failed to update row:', err);
                                         centralError = 1;
                                         centralConnection.rollback();
@@ -1047,7 +1060,7 @@ const appointment = {
                                             resolve();
                                         });
                                     });
-                                }); 
+                                });
                             });
                         });
                     });
@@ -1097,7 +1110,10 @@ const appointment = {
                                 }
                                 let query = `UPDATE appointments SET status = ?, StartHour = ?, type = ?, \`Virtual\` = ?, IsHospital = ?, City = ?, Province = ?, RegionName = ?, MainSpecialty = ?, DoctorAge = ? WHERE apptid = ?`;
                                 connection.query(query, [Status, startHour, Type, Virtual, Hospital, City, Province, Region, Specialty, Age, id], (err, result) => {
-                                    if (err) {
+                                    if (err || (result['changedRows'] == 0 && result['affectedRows'] == 0)) {
+                                        if (result['changedRows'] == 0 && result['affectedRows'] == 0) {
+                                            noUpdate = 1;
+                                        }
                                         console.error('Failed to update row:', err);
                                         fragError = 1;
                                         connection.rollback();
@@ -1139,6 +1155,9 @@ const appointment = {
         }
 
         if (centralError == 1 && fragError == 1) {
+            if (noUpdate == 1) {
+                return res.status(501).json({ error: 'No rows were updated' });
+            }
             return res.status(500).json({ error: 'Failed to update row' });
         } else if (centralError == 1) {
             // add to frag log

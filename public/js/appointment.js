@@ -91,6 +91,11 @@ async function deleteRow(link, apptid, RegionName) {
         })
         .then(response => {
             if (!response.ok) {
+                if (response.status === 501) {
+                    alert('Row not found. Please refresh the page.');
+                    window.location.href = `/appointment`;
+                    return;
+                }
                 throw new Error('Failed to delete row. Server returned ' + response.status + ': ' + response.statusText);
             }
             return response.json();
