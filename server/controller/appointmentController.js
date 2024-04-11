@@ -726,7 +726,7 @@ const appointment = {
                                         resolve();
                                         return;
                                     }
-                                    
+
                                     connection.commit((err) => {
                                         if (err) {
                                             console.error("Error committing transaction:", err);
@@ -1043,24 +1043,24 @@ const appointment = {
                                         resolve();
                                         return;
                                     }
-                                    
+
                                     try {
-                                        setTimeout(() => {
-                                            centralConnection.commit((err) => {
-                                                if (err) {
-                                                    console.error("Error committing transaction:", err);
-                                                    centralError = 1;
-                                                    centralConnection.rollback();
-                                                    centralConnection.end();
-                                                    resolve();
-                                                    return;
-                                                }
-                                                console.log('Row updated successfully');
-                                                centralConnection.end(() => {
-                                                    resolve();
-                                                });
+
+                                        centralConnection.commit((err) => {
+                                            if (err) {
+                                                console.error("Error committing transaction:", err);
+                                                centralError = 1;
+                                                centralConnection.rollback();
+                                                centralConnection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            console.log('Row updated successfully');
+                                            centralConnection.end(() => {
+                                                resolve();
                                             });
-                                        }, 15000);
+                                        });
+
                                     } catch (error) {
                                         console.log("error")
                                     }
@@ -1128,21 +1128,19 @@ const appointment = {
                                         return;
                                     }
                                     console.log('Row updated successfully');
-                                    setTimeout(() => {
-                                        connection.commit((err) => {
-                                            if (err) {
-                                                console.error("Error committing transaction:", err);
-                                                fragError = 1;
-                                                connection.rollback();
-                                                connection.end();
-                                                resolve();
-                                                return;
-                                            }
-                                            connection.end(() => {
-                                                resolve();
-                                            });
+                                    connection.commit((err) => {
+                                        if (err) {
+                                            console.error("Error committing transaction:", err);
+                                            fragError = 1;
+                                            connection.rollback();
+                                            connection.end();
+                                            resolve();
+                                            return;
+                                        }
+                                        connection.end(() => {
+                                            resolve();
                                         });
-                                    }, 15000);
+                                    });
                                 });
 
                             });
