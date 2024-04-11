@@ -1,7 +1,7 @@
 const { createConnection, DB_PORTS } = require('./../db/config');
 
-function recovery() {
-    for (let i = 0; i < 3; i++) {
+async function recoveryFunction(i) {
+    await new Promise((resolve, reject) => {
         let connection = createConnection(DB_PORTS[i]);
         connection.connect(err => {
             if (err) {
@@ -11,7 +11,13 @@ function recovery() {
             connection.query("LOCK TABLES appointment_log WRITE", (err, result) => {
                 if (err) {
                     console.log(err);
-                    connection.end();
+                    connection.query("UNLOCK TABLES", (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                    });
                     return;
                 }
             });
@@ -19,7 +25,13 @@ function recovery() {
             connection.query(query, (err, maxResult) => {
                 if (err) {
                     console.log(err);
-                    connection.end();
+                    connection.query("UNLOCK TABLES", (err, result) => {
+                        if (err) {
+                            console.log(err);
+                            connection.end();
+                            return;
+                        }
+                    });
                     return;
                 }
                 let maxId = maxResult[0]['MAX(ID)'];
@@ -63,7 +75,13 @@ function recovery() {
                                     connection.query(`DELETE FROM appointment_log WHERE ID = ?`, [ID], (err, result) => {
                                         if (err) {
                                             console.log(err);
-                                            connection.end();
+                                            connection.query("UNLOCK TABLES", (err, result) => {
+                                                if (err) {
+                                                    console.log(err);
+                                                    connection.end();
+                                                    return;
+                                                }
+                                            });
                                             return;
                                         }
                                         console.log("Deleted from log");
@@ -72,7 +90,7 @@ function recovery() {
                                 });
                             });
                         });
-                        connection.end();
+
                     });
                 }
 
@@ -85,7 +103,13 @@ function recovery() {
                 }
             });
         });
-    }
+        resolve();
+    });
+}
+async function recovery() {
+    await recoveryFunction(0);
+    await recoveryFunction(1);
+    await recoveryFunction(2);
 }
 
 module.exports = { recovery };

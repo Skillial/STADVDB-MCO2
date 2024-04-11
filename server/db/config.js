@@ -10,12 +10,16 @@ const DB_DATABASE = process.env.DB_DATABASE;
 const DB_PORTS = [DB_PORT_1, DB_PORT_2, DB_PORT_3];
 
 function createConnection(port) {
-    return mysql.createConnection({
+    let connection = mysql.createConnection({
         host: DB_HOST,
         user: DB_USER,
         database: DB_DATABASE,
         port: port
     });
+    connection.on('error', function(err) {
+        return;
+    });
+    return connection; 
 }
 
 module.exports = {
