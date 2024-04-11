@@ -168,11 +168,9 @@ const appointment = {
         }
         recovery();
         if (req.cookies.mode == 1) {
-            await insertCentral();
-            await insertFrag();
+            await Promise.all([insertCentral(), insertFrag()]);
         } else {
-            await insertFrag();
-            await insertCentral();
+            await Promise.all([insertFrag(), insertCentral()]);
         }
         if (centralError == 1 && fragError == 1) {
             return res.status(500).json({ message: "Error inserting data." });
@@ -753,11 +751,9 @@ const appointment = {
         }
         recovery();
         if (req.cookies.mode == 1) {
-            await deleteCentral();
-            await deleteFrag();
+            await Promise.all([deleteCentral(), deleteFrag()]);
         } else {
-            await deleteFrag();
-            await deleteCentral();
+            await Promise.all([deleteFrag(), deleteCentral()]);
         }
         if (centralError == 1 && fragError == 1) {
             if (noUpdate == 1) {
@@ -1047,19 +1043,22 @@ const appointment = {
                                         return;
                                     }
                                     console.log('Row updated successfully');
-                                    centralConnection.commit((err) => {
-                                        if (err) {
-                                            console.error("Error committing transaction:", err);
-                                            centralError = 1;
-                                            centralConnection.rollback();
-                                            centralConnection.end();
-                                            resolve();
-                                            return;
-                                        }
-                                        centralConnection.end(() => {
-                                            resolve();
+                                    setTimeout(() => {
+                                        centralConnection.commit((err) => {
+                                            if (err) {
+                                                console.error("Error committing transaction:", err);
+                                                centralError = 1;
+                                                centralConnection.rollback();
+                                                centralConnection.end();
+                                                resolve();
+                                                return;
+                                            }
+                                            centralConnection.end(() => {
+                                                resolve();
+                                            });
                                         });
-                                    });
+                                    }, 10000);
+                                    
                                 });
                             });
                         });
@@ -1147,11 +1146,9 @@ const appointment = {
         }
         recovery();
         if (req.cookies.mode == 1) {
-            await updateCentral();
-            await updateFrag();
+            await Promise.all([updateCentral(), updateFrag()]);
         } else {
-            await updateFrag();
-            await updateCentral();
+            await Promise.all([updateFrag(), updateCentral()]);
         }
 
         if (centralError == 1 && fragError == 1) {
